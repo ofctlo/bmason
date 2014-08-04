@@ -1,6 +1,36 @@
 = stylesheet_link_tag 'static_pages'
-%h1
-  %span brian mason
 
-%h2
-  %span software engineer
+.header
+  %h1
+    %span brian mason
+  %h2
+    %span software engineer
+
+.main-content
+  .about
+    %p
+      I create things with Ruby on Rails.
+    %p
+      I have experience with a number of other technologies including Sinatra,
+      Rspec, Javascript, jQuery, Backbone.js, React, Jasmine, HTML/CSS, Sass,
+      mySQL, PostgreSQL, Redis, Sidekiq, Git.
+    %p
+      When I'm not coding you can find me biking in the East Bay hills, taking
+      advantage of amazing camping and backpacking, engrossed in a book, or arguing
+      about politics, religion, or philosophy.
+
+  .projects
+    %h2
+      Some things I've done
+
+    %ul
+      %li.project
+        Brello - A clone of the task management software Trello that I built as an
+        exercise in building a single-page app using Backbone.js.
+      %li.project
+        Chess - A simple 2 player chess game written in JavaScript.
+      %li.project
+        Mandelbrot Set - Mandelbrot and associated Julia Set fractal viewer written
+        in JavaScript.
+
+  = render 'static_pages/contact_form'

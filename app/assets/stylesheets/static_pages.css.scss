@@ -1,5 +1,44 @@
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  text-align: center;
+}
+
 span {
   background: black;
-  color: yellow;
-  font-family: Helvetica, Arial, sans-serif;
+  color: white;
+  padding: 0.3em;
+}
+
+.header {
+  background: gray;
+  margin: 0px;
+  padding: 0;
+}
+
+.contact-form {
+  border: 1px solid white;
+
+  textarea {
+    height: 100px;
+    width: 300px;
+  }
+}
+
+.main-content {
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+button {
+  background: #444eee;
+  border: none;
+  padding: 1em;
+
+  &:hover {
+    background: #333aaa;
+  }
+
+  &:active {
+    border: 1px solid black;
+  }
 }
