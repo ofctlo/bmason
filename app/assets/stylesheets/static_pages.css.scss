@@ -1,6 +1,7 @@
 body {
   font-family: Helvetica, Arial, sans-serif;
   text-align: center;
+  background: #efefef;
 }
 
 span {
@@ -16,11 +17,26 @@ span {
 }
 
 .contact-form {
-  border: 1px solid white;
+  input, textarea {
+    min-height: 2em;
+    border: none;
+    outline: none;
+    border-bottom: 2px solid black;
+    width: 300px;
+    max-width: 300px;
+    font-size: 1em;
+    background: transparent;
+
+    &:active, &:focus {
+      border-bottom: 4px solid black;
+    }
+  }
 
   textarea {
-    height: 100px;
-    width: 300px;
+    border: 2px solid black;
+    min-height: 8em;
+    margin-top: 2em;
+    resize: none;
   }
 }
 
@@ -35,15 +51,17 @@ span {
 }
 
 button {
-  background: #444eee;
+  color: white;
+  font-size: 0.8em;
+  background: black;
   border: none;
   padding: 1em;
 
   &:hover {
-    background: #333aaa;
+    background: gray;
   }
 
   &:active {
-    border: 1px solid black;
+    background: black;
   }
 }
