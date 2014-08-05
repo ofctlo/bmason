@@ -1,19 +1,20 @@
 .contact-form
-  %h2 Contact me
+  %h3
+    %span.h-text Contact me
 
   %p I'm currently available for hire, please contact me to discuss opportunities.
 
   = form_tag(contact_url, method: :post) do
-    = label_tag 'From'
-    = text_field_tag :from
+    = text_field_tag :name, nil, placeholder: 'your name',
+                                 autocomplete: 'off'
     %br
 
-    = label_tag 'Subject'
-    = text_field_tag :subject
+    = text_field_tag :from, nil, placeholder: 'your email address',
+                                 autocomplete: 'off'
     %br
 
-    = label_tag 'Message'
-    = text_area_tag :message
+    = text_area_tag :message, nil, placeholder: 'message',
+                                   autocomplete: 'off'
     %br
 
     = button_tag 'Contact'
