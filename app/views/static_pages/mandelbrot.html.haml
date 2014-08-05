@@ -1,0 +1,10 @@
+= javascript_include_tag 'mandelbrot'
+
+%h1.h-text The Mandelbrot and Julia Sets
+.pics
+  .mandel
+    %h2.h-text Mandelbrot set
+    %canvas{ id: 'mandelbrot', height: 500, width: 500 }
+  .jul
+    %h2.h-text Julia Set (K = Mouseover Mandelbrot to set K)
+    %canvas{ id: 'julia', height: 500, width: 500 }

@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   root 'static_pages#index'
-  post '/contact' => 'static_pages#contact'
   get '/contact', to: redirect('/')
+  post '/contact' => 'static_pages#contact'
+  get '/mandelbrot', to: 'static_pages#mandelbrot'
 end

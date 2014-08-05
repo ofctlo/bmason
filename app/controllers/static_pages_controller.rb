@@ -6,4 +6,8 @@ class StaticPagesController < ActionController::Base
     ContactMailer.contact(params[:from], params[:message]).deliver
     redirect_to :root
   end
+
+  def mandelbrot
+
+  end
 end
