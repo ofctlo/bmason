@@ -1,106 +1,80 @@
 var maxIterations = 30;
 
-var jMaxIterations = 30;
-
+// Kick the whole thing off. We generate a static Mandelbrot first, and then we
+// set up a mouse listener to render a Julia set when the user mouses over the
+// Mandelbrot.
 window.onload = function() {
-  // Get the canvas object for drawing.
-  canvas = document.getElementById('mandelbrot');
-  ctx = canvas.getContext("2d");
-  // Get the size of the canvas.
-  imageHeight = canvas.getAttribute("height");
-  imageWidth = canvas.getAttribute("width");
+  var minReal = -2.0,
+      maxReal = 1.0,
+      minI = -1.5;
 
-  // With height and width we can calculate all the necessary values.
-  minReal = -2.0;
-  maxReal = 1.0;
-  minImaginary = -1.5;
-  maxImaginary = minImaginary + (maxReal - minReal) * imageHeight / imageWidth;
-
-  realPixel = (maxReal - minReal) / (imageWidth - 1);
-  imaginaryPixel = (maxImaginary - minImaginary) / (imageHeight - 1);
-
-  options = {
-    ctx: ctx,
-    height: imageHeight,
-    width: imageWidth,
-    minReal: minReal,
-    maxI: maxImaginary,
-    realPixel: realPixel,
-    iPixel: imaginaryPixel
-  }
-
-  makeMandelbrot(options);
-
-  setupJulia();
+  generateOptions('mandelbrot', minReal, maxReal, minI, function(options) {
+    makeMandelbrot(options);
+    setupJulia();
+  });
 };
 
+// This is similar to `#makeMandelbrot` but instead of actually drawing the
+// fractal, we merely set up a listener for later drawing.
+//
+// The min and max values are different to optimize Julia set viewing.
 function setupJulia() {
-  jCanvas = document.getElementById('julia');
-  jCtx = jCanvas.getContext("2d");
+  var minReal = -2.0,
+      maxReal = 2.0,
+      minI = -2;
 
-  jImageHeight = jCanvas.getAttribute("height");
-  jImageWidth = jCanvas.getAttribute("width");
+  generateOptions('julia', minReal, maxReal, minI, function(options) {
+    trackMouse(options);
+  });
+}
 
-  // With height and width we can calculate all the necessary values.
-  jMinReal = -2.0;
-  jMaxReal = 2.0;
-  jMinImaginary = -2;
-  jMaxImaginary = jMinImaginary + (jMaxReal - jMinReal) * jImageHeight / jImageWidth;
-
-  jRealPixel = (jMaxReal - jMinReal) / (jImageWidth - 1);
-  jImaginaryPixel = (jMaxImaginary - jMinImaginary) / (jImageHeight - 1);
+// Based on the dimensions of the canvas and the desired viewing window,
+// set up an options hash with the appropriate context and configurations, to be
+// passed to `#drawFractal` at some point.
+function generateOptions(canvasId, minReal, maxReal, minI, callback) {
+  var canvas = document.getElementById(canvasId),
+      ctx = canvas.getContext('2d'),
+      height = parseInt(canvas.getAttribute('height')),
+      width = parseInt(canvas.getAttribute('width')),
+      maxI = minI + (maxReal - minReal) * height / width,
+      realPixel = (maxReal - minReal) / (width - 1),
+      iPixel = (maxI - minI) / (height - 1);
 
   options = {
-    ctx: jCtx,
-    height: jImageHeight,
-    width: jImageWidth,
-    minReal: jMinReal,
-    maxI: jMaxImaginary,
-    realPixel: jRealPixel,
-    iPixel: jImaginaryPixel
+    ctx:       ctx,
+    height:    height,
+    width:     width,
+    minReal:   minReal,
+    maxI:      maxI,
+    realPixel: realPixel,
+    iPixel:    iPixel
   }
 
-  trackMouse(options);
-}
-
-function trackMouse(options) {
-  mandelbrot = document.getElementById('mandelbrot');
-  mandelbrot.addEventListener('mousemove', function(evt) {
-    var mousePosition = getMousePos(mandelbrot, evt);
-    makeJulia(mousePosition, options);
-  }, false);
-}
-
-function getMousePos(jCanvas, evt) {
-  var rect = jCanvas.getBoundingClientRect();
-  return {
-    x: evt.clientX - rect.left,
-    y: evt.clientY - rect.top
-  };
+  callback(options);
 }
 
 function makeMandelbrot(options) {
-  var height = options['height'],
-      width  = options['width'],
-      minReal = options['minReal'],
-      maxI    = options['maxI'],
-      realPixel = options['realPixel'],
-      iPixel    = options['iPixel'],
-      ctx       = options['ctx'];
+  var height    = options.height,
+      width     = options.width,
+      minReal   = options.minReal,
+      maxI      = options.maxI,
+      realPixel = options.realPixel,
+      iPixel    = options.iPixel,
+      ctx       = options.ctx;
 
-  var mandelbrot = function(zReal, zImaginary, cReal, cImaginary) {
-    zReal = zReal2 - zImaginary2 + cReal;
-    zImaginary = 2 * zReal * zImaginary + cImaginary;
-    return [zReal, zImaginary];
+  var mandelbrot = function(realPart, iPart, cReal, cImaginary) {
+    newReal = realPart*realPart - iPart*iPart + cReal;
+    newI = 2 * realPart * iPart + cImaginary;
+    return [newReal, newI];
   }
 
   drawFractal(mandelbrot,
-              imageHeight,
-              imageWidth,
+              height,
+              width,
               minReal,
-              maxImaginary,
+              maxI,
               realPixel,
-              imaginaryPixel,
+              iPixel,
               ctx);
 }
 
@@ -117,10 +91,10 @@ function makeJulia(mousePosition, options) {
   var kReal = minReal + mousePosition.x * realPixel;
   var kImaginary = maxI - mousePosition.y * iPixel;
 
-  var julia = function(zReal, zImaginary, cReal, cImaginary) {
-    zReal = zReal2 - zImaginary2 + kReal;
-    zImaginary = 2 * zReal * zImaginary + kImaginary;
-    return [zReal, zImaginary];
+  var julia = function(realPart, iPart, cReal, cImaginary) {
+    newReal = realPart*realPart - iPart*iPart + kReal;
+    newI = 2 * realPart * iPart + kImaginary;
+    return [newReal, newI];
   }
 
   drawFractal(julia,
@@ -133,29 +107,22 @@ function makeJulia(mousePosition, options) {
               ctx);
 }
 
-function drawFractal(func, height, width, minReal, maxImaginary, realPixel, imaginaryPixel, context) {
-  // Same as for the mandelbrot set, but add k each time instead of c.
+// for each pixel, draw the appropriate color into the canvas.
+// delegated to `#drawFranctalPoint`
+function drawFractal(func, height, width, minReal, maxI, realPixel, iPixel, context) {
   for (var y = 0; y < height; y++) {
-    // y values start from the top, so we subtract from maxI.
-    var cImaginary = maxImaginary - y * imaginaryPixel;
-
-    // For each value of x, from 0 to the maximum.
+    var iPart = maxI - y * iPixel; // y starts from top, so go reverse
     for (var x = 0; x < width; x++) {
-      // x values start from the left (lowest) so we add appropriately.
-      var cReal = minReal + x * realPixel;
-
-      // Set z = c.
-      var zReal = cReal;
-      var zImaginary = cImaginary;
-
-      drawFractalPoint(func, x, y, zReal, zImaginary, cReal, cImaginary, context);
+      var realPart = minReal + x * realPixel; // x is bottom to top
+      drawFractalPoint(func, x, y, realPart, iPart, context);
     }
   }
 }
 
-
-function drawFractalPoint(func, x, y, zReal, zImaginary, cReal, cImaginary, context) {
-  var result = calculateN(func, zReal, zImaginary, cReal, cImaginary);
+// calculate the n value for this location. Based on the result, color that
+// pixel accordingly.
+function drawFractalPoint(func, x, y, realPart, iPart, context) {
+  var result = calculateN(func, realPart, iPart);
   var n = result[0];
   var isInside = result[1];
 
@@ -168,35 +135,51 @@ function drawFractalPoint(func, x, y, zReal, zImaginary, cReal, cImaginary, cont
   }
 }
 
-function calculateN(func, zReal, zImaginary, cReal, cImaginary) {
-  var n;
-  for (n = 0; n < maxIterations; n++) {
-    zReal2 = zReal * zReal;
-    zImaginary2 = zImaginary * zImaginary;
-    // If absolute value of z is greater than 2.  Absolute value of complex
-    // numbers is defined as distance from origin: sqrt(zR^2 + zI^2) Can
-    // eliminate sqrt to get comparison below:
-    if (zReal2 + zImaginary2 > 4) {
-      return [n, false];
-    }
+function calculateN(func, realPart, iPart) {
+  var n,
+      cReal = realPart,
+      cImaginary = iPart;
 
-    z = func(zReal, zImaginary, cReal, cImaginary);
-    zReal = z[0];
-    zImaginary = z[1];
+  for (n = 0; n < maxIterations; n++) {
+    var realSquared = realPart * realPart, iSquared = iPart * iPart;
+
+    if (realSquared + iSquared > 4) { return [n, false]; }
+
+    var z = func(realPart, iPart, cReal, cImaginary);
+    realPart = z[0];
+    iPart = z[1];
   }
   return [n, true];
 }
 
+// When the user mouses over the Mandelbrot view, we want to rerender the Julia
+// with that K value.
+function trackMouse(options) {
+  var mandelbrot = document.getElementById('mandelbrot');
+  mandelbrot.addEventListener('mousemove', function(evt) {
+    var mousePosition = getMousePos(mandelbrot, evt);
+    makeJulia(mousePosition, options);
+  }, false);
+}
+
+function getMousePos(jCanvas, evt) {
+  var rect = jCanvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+  };
+}
+
 function blackToRed(x, y, n, ctx) {
-  hex = hexColor(n);
-  var color = '#' + hex + '0000';
+  var hex = hexColor(n),
+      color = '#' + hex + '0000';
 
   draw(x, y, color, ctx);
 }
 
 function redToWhite(x, y, n, ctx) {
-  hex = hexColor(n);
-  var color = '#ff' + hex + hex;
+  var hex = hexColor(n),
+      color = '#ff' + hex + hex;
 
   draw(x, y, color, ctx);
 }
