@@ -1,11 +1,12 @@
 class ContactMailer < ActionMailer::Base
-  default to: 'Brian Mason <brian.dale.mason+bmasonio@gmail.com>'
-  default from: 'contact@bmason.io'
+  RECIPIENT = 'Brian Mason <brian.dale.mason+bmasonio@gmail.com>'
+  SENDER = 'contact@bmason.io'
+
+  default to: RECIPIENT
+  default from: SENDER
 
   def contact(name, from, message)
-    mail to: RECIPIENT,
-         from: SENDER,
-         subject: "Email from: #{name} <#{from}>",
+    mail subject: "Email from: #{name} <#{from}>",
          body: message
   end
 end
