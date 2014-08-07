@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'capistrano'
-gem 'capistrano-rails'
+gem 'capistrano', '2.15.5'
 gem 'coffee-rails', '~> 4.0.0'
 gem 'haml'
 gem 'jbuilder', '~> 2.0'
