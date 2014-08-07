@@ -81,15 +81,17 @@
         iPixel    = options.iPixel,
         ctx       = options.ctx;
 
-    // First we need to find the value of k.
-    var kReal = minReal + mousePosition.x * realPixel;
-    var kImaginary = maxI - mousePosition.y * iPixel;
+    var julia = (function () {
+      // First we need to find the value of k.
+      var kReal = minReal + mousePosition.x * realPixel;
+      var kImaginary = maxI - mousePosition.y * iPixel;
 
-    var julia = function(realPart, iPart, cReal, cImaginary) {
-      newReal = realPart*realPart - iPart*iPart + kReal;
-      newI = 2 * realPart * iPart + kImaginary;
-      return [newReal, newI];
-    }
+      return function(realPart, iPart, cReal, cImaginary) {
+        newReal = realPart*realPart - iPart*iPart + kReal;
+        newI = 2 * realPart * iPart + kImaginary;
+        return [newReal, newI];
+      }
+    })();
 
     drawFractal(julia,
                 height,
