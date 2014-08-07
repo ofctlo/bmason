@@ -3,7 +3,7 @@ class StaticPagesController < ActionController::Base
   end
 
   def contact
-    ContactMailer.contact(params[:from], params[:message]).deliver
+    ContactMailer.contact(params[:name], params[:from], params[:message]).deliver
     redirect_to :root
   end
 
