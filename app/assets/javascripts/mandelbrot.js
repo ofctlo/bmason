@@ -85,11 +85,15 @@
         ctx       = options.ctx,
         mousePos  = options.mousePos;
 
-    for (var y = 0; y < height; y++) {
+    ctx.fillStyle = 'white';
+    ctx.clearRect(0, 0, width, height);
+
+    for (var y = 0.0; y < height; y++) {
       var iPart = maxI - y * iPixel; // y starts from top, so go reverse
-      for (var x = 0; x < width; x++) {
+      for (var x = 0.0; x < width; x++) {
         var realPart = minReal + x * realPixel; // x is bottom to top
         var n = calculateN(func, realPart, iPart)
+
         drawFractalPoint(x, y, n, ctx);
       }
     }
@@ -115,11 +119,12 @@
   function drawFractalPoint(x, y, n, context) {
     if (n == maxIterations) {
       draw(x, y, '#000000', context);
-    } else if (n < maxIterations / 2) {
-      blackToRed(x, y, n, context);
-    } else if (n >= maxIterations / 2) {
-      redToWhite(x, y, n, context);
     }
+    //} else if (n < maxIterations / 2) {
+    //  blackToRed(x, y, n, context);
+    //} else if (n >= maxIterations / 2) {
+    //  redToWhite(x, y, n, context);
+    //}
   }
 
   function getMousePos(jCanvas, evt) {
