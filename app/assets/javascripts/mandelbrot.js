@@ -1,5 +1,7 @@
 ;(function() {
-  var maxIterations = 30;
+  var maxIterations = 30,
+      colorConversion = (255 / (maxIterations / 2)),
+      colors = {}; // memoized colors for n values
 
   function setupMandelbrot() {
     var minReal = -2.0,
@@ -143,8 +145,7 @@
   }
 
   function hexColor(n) {
-    var color = (255 / (maxIterations / 2)) * n;
-    return color.toString(16);
+    return colors[n] = colors[n] || (colorConversion * n).toString(16);
   }
 
   function draw(x, y, color, ctx) {
