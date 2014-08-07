@@ -73,13 +73,13 @@
   }
 
   function makeJulia(mousePosition, options) {
-    var height = options['height'],
-        width  = options['width'],
-        minReal = options['minReal'],
-        maxI    = options['maxI'],
-        realPixel = options['realPixel'],
-        iPixel    = options['iPixel'],
-        ctx       = options['ctx'];
+    var height = options.height,
+        width  = options.width,
+        minReal = options.minReal,
+        maxI    = options.maxI,
+        realPixel = options.realPixel,
+        iPixel    = options.iPixel,
+        ctx       = options.ctx;
 
     // First we need to find the value of k.
     var kReal = minReal + mousePosition.x * realPixel;
@@ -108,24 +108,9 @@
       var iPart = maxI - y * iPixel; // y starts from top, so go reverse
       for (var x = 0; x < width; x++) {
         var realPart = minReal + x * realPixel; // x is bottom to top
-        drawFractalPoint(func, x, y, realPart, iPart, context);
+        var n = calculateN(func, realPart, iPart)
+        drawFractalPoint(x, y, n, context);
       }
-    }
-  }
-
-  // calculate the n value for this location. Based on the result, color that
-  // pixel accordingly.
-  function drawFractalPoint(func, x, y, realPart, iPart, context) {
-    var result = calculateN(func, realPart, iPart);
-    var n = result[0];
-    var isInside = result[1];
-
-    if (isInside || n == maxIterations) {
-      draw(x, y, '#000000', context);
-    } else if (n < maxIterations / 2) {
-      blackToRed(x, y, n, context);
-    } else if (n >= maxIterations / 2) {
-      redToWhite(x, y, n, context);
     }
   }
 
@@ -137,13 +122,25 @@
     for (n = 0; n < maxIterations; n++) {
       var realSquared = realPart * realPart, iSquared = iPart * iPart;
 
-      if (realSquared + iSquared > 4) { return [n, false]; }
+      if (realSquared + iSquared > 4) { return n; }
 
+      // Perform whatever calculates the equation defining the fractal demands
       var z = func(realPart, iPart, cReal, cImaginary);
       realPart = z[0];
       iPart = z[1];
     }
-    return [n, true];
+    return n;
+  }
+
+  // Based on the value of n, color that pixel accordingly.
+  function drawFractalPoint(x, y, n, context) {
+    if (n == maxIterations) {
+      draw(x, y, '#000000', context);
+    } else if (n < maxIterations / 2) {
+      blackToRed(x, y, n, context);
+    } else if (n >= maxIterations / 2) {
+      redToWhite(x, y, n, context);
+    }
   }
 
   // When the user mouses over the Mandelbrot view, we want to rerender the Julia
