@@ -1,14 +1,20 @@
 ;(function() {
   var maxIterations = 30;
 
-  window.onload = function() {
+  function setupMandelbrot() {
     var minReal = -2.0,
         maxReal = 1.0,
         minI = -1.5;
 
     options = generateOptions('mandelbrot', minReal, maxReal, minI)
-    makeMandelbrot(options);
-    setupJulia();
+
+    var mandelbrot_func = function(realPart, iPart, cReal, cImaginary) {
+      newReal = realPart*realPart - iPart*iPart + cReal;
+      newI = 2 * realPart * iPart + cImaginary;
+      return [newReal, newI];
+    }
+
+    drawFractal(mandelbrot_func, options);
   }
 
   // This is similar to `#makeMandelbrot` but instead of actually drawing the
@@ -21,7 +27,25 @@
         minI = -2;
 
     options = generateOptions('julia', minReal, maxReal, minI);
-    trackMouse(options);
+
+    var mandelbrot = document.getElementById('mandelbrot');
+    mandelbrot.addEventListener('mousemove', function(evt) {
+      options['mousePos'] = getMousePos(mandelbrot, evt);
+
+      var juliaFunc = (function () {
+        // First we need to find the value of k.
+        var kReal = options.minReal + options.mousePos.x * options.realPixel;
+        var kImaginary = options.maxI - options.mousePos.y * options.iPixel;
+
+        return function(realPart, iPart, cReal, cImaginary) {
+          newReal = realPart*realPart - iPart*iPart + kReal;
+          newI = 2 * realPart * iPart + kImaginary;
+          return [newReal, newI];
+        }
+      })();
+
+      drawFractal(juliaFunc, options);
+    }, false);
   }
 
   // Based on the dimensions of the canvas and the desired viewing window,
@@ -47,71 +71,24 @@
     }
   }
 
-  function makeMandelbrot(options) {
-    var height    = options.height,
-        width     = options.width,
-        minReal   = options.minReal,
-        maxI      = options.maxI,
-        realPixel = options.realPixel,
-        iPixel    = options.iPixel,
-        ctx       = options.ctx;
-
-    var mandelbrot = function(realPart, iPart, cReal, cImaginary) {
-      newReal = realPart*realPart - iPart*iPart + cReal;
-      newI = 2 * realPart * iPart + cImaginary;
-      return [newReal, newI];
-    }
-
-    drawFractal(mandelbrot,
-                height,
-                width,
-                minReal,
-                maxI,
-                realPixel,
-                iPixel,
-                ctx);
-  }
-
-  function makeJulia(mousePosition, options) {
+  // for each pixel, draw the appropriate color into the canvas.
+  // delegated to `#drawFranctalPoint`
+  function drawFractal(func, options) {
     var height = options.height,
         width  = options.width,
         minReal = options.minReal,
         maxI    = options.maxI,
         realPixel = options.realPixel,
         iPixel    = options.iPixel,
-        ctx       = options.ctx;
+        ctx       = options.ctx,
+        mousePos  = options.mousePos;
 
-    var julia = (function () {
-      // First we need to find the value of k.
-      var kReal = minReal + mousePosition.x * realPixel;
-      var kImaginary = maxI - mousePosition.y * iPixel;
-
-      return function(realPart, iPart, cReal, cImaginary) {
-        newReal = realPart*realPart - iPart*iPart + kReal;
-        newI = 2 * realPart * iPart + kImaginary;
-        return [newReal, newI];
-      }
-    })();
-
-    drawFractal(julia,
-                height,
-                width,
-                minReal,
-                maxI,
-                realPixel,
-                iPixel,
-                ctx);
-  }
-
-  // for each pixel, draw the appropriate color into the canvas.
-  // delegated to `#drawFranctalPoint`
-  function drawFractal(func, height, width, minReal, maxI, realPixel, iPixel, context) {
     for (var y = 0; y < height; y++) {
       var iPart = maxI - y * iPixel; // y starts from top, so go reverse
       for (var x = 0; x < width; x++) {
         var realPart = minReal + x * realPixel; // x is bottom to top
         var n = calculateN(func, realPart, iPart)
-        drawFractalPoint(x, y, n, context);
+        drawFractalPoint(x, y, n, ctx);
       }
     }
   }
@@ -145,16 +122,6 @@
     }
   }
 
-  // When the user mouses over the Mandelbrot view, we want to rerender the Julia
-  // with that K value.
-  function trackMouse(options) {
-    var mandelbrot = document.getElementById('mandelbrot');
-    mandelbrot.addEventListener('mousemove', function(evt) {
-      var mousePosition = getMousePos(mandelbrot, evt);
-      makeJulia(mousePosition, options);
-    }, false);
-  }
-
   function getMousePos(jCanvas, evt) {
     var rect = jCanvas.getBoundingClientRect();
     return {
@@ -186,5 +153,9 @@
     ctx.fillStyle = color;
     ctx.fillRect(x, y, 1, 1);
   }
-})();
 
+  window.onload = function() {
+    setupMandelbrot();
+    setupJulia();
+  }
+})();
