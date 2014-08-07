@@ -99,9 +99,7 @@
         cImaginary = iPart;
 
     for (n = 0; n < maxIterations; n++) {
-      var realSquared = realPart * realPart, iSquared = iPart * iPart;
-
-      if (realSquared + iSquared > 4) { return n; }
+      if (realPart * realPart + iPart * iPart > 4) { return n; }
 
       // Perform whatever calculates the equation defining the fractal demands
       var z = func(realPart, iPart, cReal, cImaginary);
