@@ -32,6 +32,7 @@
 
     var mandelbrot = document.getElementById('mandelbrot');
     mandelbrot.addEventListener('mousemove', function(evt) {
+      // This extra option is needed to create the Julia set
       options['mousePos'] = getMousePos(mandelbrot, evt);
 
       var juliaFunc = (function () {
@@ -51,8 +52,7 @@
   }
 
   // Based on the dimensions of the canvas and the desired viewing window,
-  // set up an options hash with the appropriate context and configurations, to be
-  // passed to `#drawFractal` at some point.
+  // set up an options hash with the appropriate context and configurations
   function generateOptions(canvasId, minReal, maxReal, minI) {
     var canvas = document.getElementById(canvasId),
         ctx = canvas.getContext('2d'),
@@ -73,8 +73,8 @@
     }
   }
 
-  // for each pixel, draw the appropriate color into the canvas.
-  // delegated to `#drawFranctalPoint`
+  // for each pixel, draw the appropriate color into the canvas. Delegated to
+  // `#drawFranctalPoint`
   function drawFractal(func, options) {
     var height = options.height,
         width  = options.width,
