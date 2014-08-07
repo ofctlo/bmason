@@ -6,10 +6,9 @@
         maxReal = 1.0,
         minI = -1.5;
 
-    generateOptions('mandelbrot', minReal, maxReal, minI, function(options) {
-      makeMandelbrot(options);
-      setupJulia();
-    });
+    options = generateOptions('mandelbrot', minReal, maxReal, minI)
+    makeMandelbrot(options);
+    setupJulia();
   }
 
   // This is similar to `#makeMandelbrot` but instead of actually drawing the
@@ -21,15 +20,14 @@
         maxReal = 2.0,
         minI = -2;
 
-    generateOptions('julia', minReal, maxReal, minI, function(options) {
-      trackMouse(options);
-    });
+    options = generateOptions('julia', minReal, maxReal, minI);
+    trackMouse(options);
   }
 
   // Based on the dimensions of the canvas and the desired viewing window,
   // set up an options hash with the appropriate context and configurations, to be
   // passed to `#drawFractal` at some point.
-  function generateOptions(canvasId, minReal, maxReal, minI, callback) {
+  function generateOptions(canvasId, minReal, maxReal, minI) {
     var canvas = document.getElementById(canvasId),
         ctx = canvas.getContext('2d'),
         height = parseInt(canvas.getAttribute('height')),
@@ -38,7 +36,7 @@
         realPixel = (maxReal - minReal) / (width - 1),
         iPixel = (maxI - minI) / (height - 1);
 
-    options = {
+    return {
       ctx:       ctx,
       height:    height,
       width:     width,
@@ -47,8 +45,6 @@
       realPixel: realPixel,
       iPixel:    iPixel
     }
-
-    callback(options);
   }
 
   function makeMandelbrot(options) {
