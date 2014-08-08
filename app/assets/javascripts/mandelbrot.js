@@ -24,10 +24,17 @@
 
   // For each point on the canvas calculate n = number of iterations to escape
   // and then colorize appropriately.
+  // This function can take c values to override the default when calculating N.
+  // This allows us to use the K value from the Mandelbrot mouseover to generate
+  // the Julia set.
   //
   // TODO: figure out a color scheme and optimize drawing code so that colors
   // aren't prohibitively slow.
-  Fractal.prototype.drawFractal = function() {
+  Fractal.prototype.drawFractal = function(cReal, cImaginary) {
+    // the 'c' params are optional.
+    cReal = typeof cReal !== 'undefined' ? cReal : null;
+    cImaginary = typeof cImaginary !== 'undefined' ? cImaginary : null;
+
     this.context.fillStyle = 'white';
     this.context.clearRect(0, 0, this.width, this.height);
 
@@ -35,7 +42,7 @@
       var iPart = this.maxI - y * this.iPixel;
       for (var x = 0; x < this.width; x++) {
         var realPart = this.minReal + x * this.realPixel;
-        var n = this.calculateN(realPart, iPart);
+        var n = this.calculateN(realPart, iPart, cReal, cImaginary);
 
         this.drawPoint(x, y, n);
       }
@@ -47,10 +54,13 @@
   // maximum is 30 iterations, and we consider the value to have escaped if the
   // square root of the real part plus the i part is greater than 2 (outside the
   // bounds of the fractal and display.
-  Fractal.prototype.calculateN = function(realPart, iPart) {
+  //
+  // If c is given, use that. Otherwise default to c is the same as realPart and
+  // iPart.
+  Fractal.prototype.calculateN = function(realPart, iPart, cReal, cImaginary) {
     var n;
-    var cReal      = realPart,
-        cImaginary = iPart;
+    var cReal      = cReal || realPart,
+        cImaginary = cImaginary || iPart;
 
     for (n = 0; n < maxIterations; n++) {
       if (realPart * realPart + iPart * iPart > 4) { return n; }
@@ -97,7 +107,7 @@
   window.onload = function() {
     // The function for calculating values in the Mandelbrot set.
     var mandelbrotFunc = function(realPart, iPart, cReal, cImaginary) {
-      newReal = realPart*realPart - iPart*iPart + cReal;
+      newReal = realPart * realPart - iPart * iPart + cReal;
       newI = 2 * realPart * iPart + cImaginary;
       return [newReal, newI];
     }
@@ -105,10 +115,15 @@
     var mandelbrot = new Fractal(mandelbrotFunc, 'mandelbrot', -2.0, 1.0, -1.5);
     mandelbrot.drawFractal();
 
-    // We don't have a real generator for the Julia set yet. It requires a K
-    // value which won't exist until mouseover. We set the generator below in
-    // the event handler.
-    var julia = new Fractal(function(){}, 'julia', -2.0, 2.0, -2.0);
+    // When this function is called the cReal and cImaginary values correspond
+    // to K.
+    var juliaFunc = function(realPart, iPart, cReal, cImaginary) {
+      newReal = realPart * realPart - iPart * iPart + cReal;
+      newI = 2 * realPart * iPart + cImaginary;
+      return [newReal, newI];
+    }
+
+    var julia = new Fractal(juliaFunc, 'julia', -2.0, 2.0, -2.0);
 
     // setup event handling
     var mandelbrotCanvas = mandelbrot.canvas
@@ -119,14 +134,8 @@
       var kReal = julia.minReal + mousePos.x * julia.realPixel;
       var kImaginary = julia.maxI - mousePos.y * julia.iPixel;
 
-      newJuliaFunc = function(realPart, iPart, cReal, cImaginary) {
-        newReal = realPart*realPart - iPart*iPart + kReal;
-        newI = 2 * realPart * iPart + kImaginary;
-        return [newReal, newI];
-      }
-      julia.setGenerator(newJuliaFunc);
-
-      julia.drawFractal();
+      // We can pass in K to override the default of K = C
+      julia.drawFractal(kReal, kImaginary);
     }, false);
   }
 })();
