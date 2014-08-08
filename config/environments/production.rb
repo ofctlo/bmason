@@ -21,8 +21,8 @@ Rails.application.configure do
     domain:               'bmason.io',
     authentication:       'plain',
     enable_starttls_auto: true,
-    user_name:            'brian.dale.mason',
-    password:             'gategateparagateparasangatebodhisvaha',
+    user_name:            'brian.dale.mason@gmail.com',
+    password:             'gategateparagateparasangate',
   }
 
   config.action_mailer.default_url_options = { host: 'www.bmason.io' }
