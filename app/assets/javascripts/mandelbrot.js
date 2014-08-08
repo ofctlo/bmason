@@ -1,130 +1,89 @@
 ;(function() {
-  var maxIterations = 30,
-      colorConversion = (255 / (maxIterations / 2)),
-      colors = {}; // memoized colors for n values
+  var maxIterations = 30;
 
-  function setupMandelbrot() {
-    var minReal = -2.0,
-        maxReal = 1.0,
-        minI = -1.5;
-
-    options = generateOptions('mandelbrot', minReal, maxReal, minI)
-
-    var mandelbrot_func = function(realPart, iPart, cReal, cImaginary) {
-      newReal = realPart*realPart - iPart*iPart + cReal;
-      newI = 2 * realPart * iPart + cImaginary;
-      return [newReal, newI];
-    }
-
-    drawFractal(mandelbrot_func, options);
-  }
-
-  // This is similar to `#makeMandelbrot` but instead of actually drawing the
-  // fractal, we merely set up a listener for later drawing.
+  // The Fractal object is initialized with a generator that is the defining
+  // function for that fractal. The canvas and bounds are passed in as well for
+  // drawing purposes.
   //
-  // The min and max values are different to optimize Julia set viewing.
-  function setupJulia() {
-    var minReal = -2.0,
-        maxReal = 2.0,
-        minI = -2;
-
-    options = generateOptions('julia', minReal, maxReal, minI);
-
-    var mandelbrot = document.getElementById('mandelbrot');
-    mandelbrot.addEventListener('mousemove', function(evt) {
-      // This extra option is needed to create the Julia set
-      options['mousePos'] = getMousePos(mandelbrot, evt);
-
-      var juliaFunc = (function () {
-        // First we need to find the value of k.
-        var kReal = options.minReal + options.mousePos.x * options.realPixel;
-        var kImaginary = options.maxI - options.mousePos.y * options.iPixel;
-
-        return function(realPart, iPart, cReal, cImaginary) {
-          newReal = realPart*realPart - iPart*iPart + kReal;
-          newI = 2 * realPart * iPart + kImaginary;
-          return [newReal, newI];
-        }
-      })();
-
-      drawFractal(juliaFunc, options);
-    }, false);
+  // TODO: break out drawing/rendering code from the Fractal object which
+  // doesn't need to know about that.
+  function Fractal(generator, canvasId, minReal, maxReal, minI) {
+    this.generator = generator;
+    this.canvasId  = canvasId;
+    this.canvas    = document.getElementById(this.canvasId);
+    this.context   = this.canvas.getContext('2d');
+    this.width     = parseInt(this.canvas.getAttribute('width'));
+    this.height    = parseInt(this.canvas.getAttribute('height'));
+    this.minReal   = minReal;
+    this.maxReal   = maxReal;
+    this.minI      = minI;
+    this.maxI      = this.minI + (this.maxReal - this.minReal) * this.height / this.width;
+    this.realPixel = (this.maxReal - this.minReal) / (this.width - 1);
+    this.iPixel    = (this.maxI - this.minI) / (this.height - 1);
   }
 
-  // Based on the dimensions of the canvas and the desired viewing window,
-  // set up an options hash with the appropriate context and configurations
-  function generateOptions(canvasId, minReal, maxReal, minI) {
-    var canvas = document.getElementById(canvasId),
-        ctx = canvas.getContext('2d'),
-        height = parseInt(canvas.getAttribute('height')),
-        width = parseInt(canvas.getAttribute('width')),
-        maxI = minI + (maxReal - minReal) * height / width,
-        realPixel = (maxReal - minReal) / (width - 1),
-        iPixel = (maxI - minI) / (height - 1);
+  // For each point on the canvas calculate n = number of iterations to escape
+  // and then colorize appropriately.
+  //
+  // TODO: figure out a color scheme and optimize drawing code so that colors
+  // aren't prohibitively slow.
+  Fractal.prototype.drawFractal = function() {
+    this.context.fillStyle = 'white';
+    this.context.clearRect(0, 0, this.width, this.height);
 
-    return {
-      ctx:       ctx,
-      height:    height,
-      width:     width,
-      minReal:   minReal,
-      maxI:      maxI,
-      realPixel: realPixel,
-      iPixel:    iPixel
-    }
-  }
+    for (var y = 0; y < this.height; y++) {
+      var iPart = this.maxI - y * this.iPixel;
+      for (var x = 0; x < this.width; x++) {
+        var realPart = this.minReal + x * this.realPixel;
+        var n = this.calculateN(realPart, iPart);
 
-  // for each pixel, draw the appropriate color into the canvas. Delegated to
-  // `#drawFranctalPoint`
-  function drawFractal(func, options) {
-    var height = options.height,
-        width  = options.width,
-        minReal = options.minReal,
-        maxI    = options.maxI,
-        realPixel = options.realPixel,
-        iPixel    = options.iPixel,
-        ctx       = options.ctx,
-        mousePos  = options.mousePos;
-
-    ctx.fillStyle = 'white';
-    ctx.clearRect(0, 0, width, height);
-
-    for (var y = 0.0; y < height; y++) {
-      var iPart = maxI - y * iPixel; // y starts from top, so go reverse
-      for (var x = 0.0; x < width; x++) {
-        var realPart = minReal + x * realPixel; // x is bottom to top
-        var n = calculateN(func, realPart, iPart)
-
-        drawFractalPoint(x, y, n, ctx);
+        this.drawPoint(x, y, n);
       }
     }
   }
 
-  function calculateN(func, realPart, iPart) {
-    var n,
-        cReal = realPart,
+  // Given a real and imaginary value (a point on the graph of the fractal)
+  // calculate how many iterations are required before the value 'escapes.' The
+  // maximum is 30 iterations, and we consider the value to have escaped if the
+  // square root of the real part plus the i part is greater than 2 (outside the
+  // bounds of the fractal and display.
+  Fractal.prototype.calculateN = function(realPart, iPart) {
+    var n;
+    var cReal      = realPart,
         cImaginary = iPart;
 
     for (n = 0; n < maxIterations; n++) {
       if (realPart * realPart + iPart * iPart > 4) { return n; }
 
-      // Perform whatever calculates the equation defining the fractal demands
-      var z = func(realPart, iPart, cReal, cImaginary);
+      var z = this.generator(realPart, iPart, cReal, cImaginary);
       realPart = z[0];
-      iPart = z[1];
+      iPart    = z[1];
     }
+
     return n;
   }
 
-  // Based on the value of n, color that pixel accordingly.
-  function drawFractalPoint(x, y, n, context) {
-    if (n == maxIterations) {
-      draw(x, y, '#000000', context);
-    }
-    //} else if (n < maxIterations / 2) {
-    //  blackToRed(x, y, n, context);
-    //} else if (n >= maxIterations / 2) {
-    //  redToWhite(x, y, n, context);
-    //}
+  // Currently we only draw if n is equal to max iterations, which means the
+  // point is a part of the set. If we want to make pretty colors we need to
+  // have a color scheme for coloring points not in the set based on how long it
+  // takes for the value at that point to escape.
+  Fractal.prototype.drawPoint = function(x, y, n) {
+    if (n == maxIterations) { draw(x, y, '#000000', this.context) }
+  }
+
+  // This is used for the Julia fractal to get around the point that every time
+  // we update based on a new K value, we're sort of rendering a different
+  // Fractal. Rather than initialize a totally new object, we just need to
+  // update this function with new values of K, which we do using a closure
+  // below in the window.onload function.
+  Fractal.prototype.setGenerator = function(generator) {
+    this.generator = generator;
+  }
+
+  // Draw a point a certain color.
+  function draw(x, y, color, ctx) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, 1, 1);
   }
 
   function getMousePos(jCanvas, evt) {
@@ -135,31 +94,39 @@
     };
   }
 
-  function blackToRed(x, y, n, ctx) {
-    var hex = hexColor(n),
-        color = '#' + hex + '0000';
-
-    draw(x, y, color, ctx);
-  }
-
-  function redToWhite(x, y, n, ctx) {
-    var hex = hexColor(n),
-        color = '#ff' + hex + hex;
-
-    draw(x, y, color, ctx);
-  }
-
-  function hexColor(n) {
-    return colors[n] = colors[n] || (colorConversion * n).toString(16);
-  }
-
-  function draw(x, y, color, ctx) {
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, 1, 1);
-  }
-
   window.onload = function() {
-    setupMandelbrot();
-    setupJulia();
+    // The function for calculating values in the Mandelbrot set.
+    var mandelbrotFunc = function(realPart, iPart, cReal, cImaginary) {
+      newReal = realPart*realPart - iPart*iPart + cReal;
+      newI = 2 * realPart * iPart + cImaginary;
+      return [newReal, newI];
+    }
+
+    var mandelbrot = new Fractal(mandelbrotFunc, 'mandelbrot', -2.0, 1.0, -1.5);
+    mandelbrot.drawFractal();
+
+    // We don't have a real generator for the Julia set yet. It requires a K
+    // value which won't exist until mouseover. We set the generator below in
+    // the event handler.
+    var julia = new Fractal(function(){}, 'julia', -2.0, 2.0, -2.0);
+
+    // setup event handling
+    var mandelbrotCanvas = mandelbrot.canvas
+    mandelbrotCanvas.addEventListener('mousemove', function(evt) {
+      // This extra option is needed to create the Julia set
+      mousePos = getMousePos(mandelbrotCanvas, evt);
+
+      var kReal = julia.minReal + mousePos.x * julia.realPixel;
+      var kImaginary = julia.maxI - mousePos.y * julia.iPixel;
+
+      newJuliaFunc = function(realPart, iPart, cReal, cImaginary) {
+        newReal = realPart*realPart - iPart*iPart + kReal;
+        newI = 2 * realPart * iPart + kImaginary;
+        return [newReal, newI];
+      }
+      julia.setGenerator(newJuliaFunc);
+
+      julia.drawFractal();
+    }, false);
   }
 })();
