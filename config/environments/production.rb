@@ -20,7 +20,6 @@ Rails.application.configure do
     port:                 587,
     domain:               'bmason.io',
     authentication:       'plain',
-    enable_starttls_auto: true,
     user_name:            'brian.dale.mason@gmail.com',
     password:             'gategateparagateparasangate',
   }
