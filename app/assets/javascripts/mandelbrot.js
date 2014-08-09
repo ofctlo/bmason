@@ -1,5 +1,6 @@
 ;(function() {
   var maxIterations = 30;
+  var juliaMode = 'mousemove';
 
   // The Fractal object is initialized with a generator that is the defining
   // function for that fractal. The canvas and bounds are passed in as well for
@@ -126,14 +127,14 @@
       newI = 2 * realPart * iPart + cImaginary;
       return [newReal, newI];
     }
-
     var julia = new Fractal(juliaFunc, 'julia', -2.0, 2.0, -2.0);
 
     // setup event handling
-    var mandelbrotCanvas = mandelbrot.canvas
-    mandelbrotCanvas.addEventListener('mousemove', function(evt) {
+    var mandelbrotCanvas = mandelbrot.canvas;
+
+    julia.setUpdateFunction(function(e) {
       // This extra option is needed to create the Julia set
-      mousePos = getMousePos(mandelbrotCanvas, evt);
+      mousePos = getMousePos(mandelbrotCanvas, e);
 
       var kReal = julia.minReal + mousePos.x * julia.realPixel;
       var kImaginary = julia.maxI - mousePos.y * julia.iPixel;
@@ -141,5 +142,25 @@
       // We can pass in K to override the default of K = C
       julia.drawFractal(kReal, kImaginary);
     }, false);
+
+    mandelbrotCanvas.addEventListener('mousemove', julia.updateFunction);
+
+    // set up toggling of mode
+    var modeToggle = document.getElementById('mode-toggle');
+    modeToggle.addEventListener('click', function(e) {
+      button = e.currentTarget;
+      if (juliaMode === 'mousemove') {
+        mandelbrotCanvas.removeEventListener(juliaMode, julia.updateFunction);
+        juliaMode = 'click';
+        mandelbrotCanvas.addEventListener(juliaMode, julia.updateFunction);
+
+        button.innerHTML = 'use mouse move';
+      } else if (button.innerHTML === 'use mouse move') {
+        mandelbrotCanvas.removeEventListener(juliaMode, julia.updateFunction);
+        juliaMode = 'mousemove'
+        mandelbrotCanvas.addEventListener(juliaMode, julia.updateFunction);
+        button.innerHTML = 'use click';
+      }
+    });
   }
 })();
