@@ -59,6 +59,7 @@
   // iPart.
   Fractal.prototype.calculateN = function(realPart, iPart, cReal, cImaginary) {
     var n;
+
     var cReal      = cReal || realPart,
         cImaginary = cImaginary || iPart;
 
@@ -78,7 +79,7 @@
   // have a color scheme for coloring points not in the set based on how long it
   // takes for the value at that point to escape.
   Fractal.prototype.drawPoint = function(x, y, n) {
-    if (n == maxIterations) { draw(x, y, '#000000', this.context) }
+    if (n == maxIterations) { draw(x, y, '#000000', this.context); }
   }
 
   // This is used for the Julia fractal to get around the point that every time
@@ -90,17 +91,21 @@
     this.generator = generator;
   }
 
+  Fractal.prototype.setUpdateFunction = function(updateFunction) {
+    this.updateFunction = updateFunction;
+  }
+
   // Draw a point a certain color.
   function draw(x, y, color, ctx) {
     ctx.fillStyle = color;
     ctx.fillRect(x, y, 1, 1);
   }
 
-  function getMousePos(jCanvas, evt) {
+  function getMousePos(jCanvas, e) {
     var rect = jCanvas.getBoundingClientRect();
     return {
-      x: evt.clientX - rect.left,
-      y: evt.clientY - rect.top
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
     };
   }
 
@@ -111,7 +116,6 @@
       newI = 2 * realPart * iPart + cImaginary;
       return [newReal, newI];
     }
-
     var mandelbrot = new Fractal(mandelbrotFunc, 'mandelbrot', -2.0, 1.0, -1.5);
     mandelbrot.drawFractal();
 
