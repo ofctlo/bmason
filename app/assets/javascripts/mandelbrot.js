@@ -1,5 +1,5 @@
 ;(function() {
-  var maxIterations = 30;
+  var maxIterations = 100;
   var juliaMode = 'mousemove';
 
   // The Fractal object is initialized with a generator that is the defining
@@ -39,15 +39,36 @@
     this.context.fillStyle = 'white';
     this.context.clearRect(0, 0, this.width, this.height);
 
+    imageData = this.context.getImageData(0, 0, this.width, this.height);
+    data = imageData.data
     for (var y = 0; y < this.height; y++) {
       var iPart = this.maxI - y * this.iPixel;
       for (var x = 0; x < this.width; x++) {
         var realPart = this.minReal + x * this.realPixel;
         var n = this.calculateN(realPart, iPart, cReal, cImaginary);
 
-        this.drawPoint(x, y, n);
+        // TODO: allow some customization of color options
+        var r, g, b;
+        var i = (this.width * y + x) * 4
+        //this.drawPoint(x, y, n);
+        if (n == maxIterations) {
+          r = 0, g = 0, b = 0;
+        //} else if (n > maxIterations / 10) {
+        //  b = 255;
+        //  g = (255 / (maxIterations / 2)) * n;
+        //  r = g;
+        } else {
+          b = (255 / (maxIterations / 2)) * n;
+          g = 0, r = 0;
+        }
+
+        data[i] = r;
+        data[i + 1] = g;
+        data[i + 2] = b;
+        data[i + 3] = 255; // alpha
       }
     }
+    this.context.putImageData(imageData, 0, 0);
   }
 
   // Given a real and imaginary value (a point on the graph of the fractal)
@@ -75,31 +96,8 @@
     return n;
   }
 
-  // Currently we only draw if n is equal to max iterations, which means the
-  // point is a part of the set. If we want to make pretty colors we need to
-  // have a color scheme for coloring points not in the set based on how long it
-  // takes for the value at that point to escape.
-  Fractal.prototype.drawPoint = function(x, y, n) {
-    if (n == maxIterations) { draw(x, y, '#000000', this.context); }
-  }
-
-  // This is used for the Julia fractal to get around the point that every time
-  // we update based on a new K value, we're sort of rendering a different
-  // Fractal. Rather than initialize a totally new object, we just need to
-  // update this function with new values of K, which we do using a closure
-  // below in the window.onload function.
-  Fractal.prototype.setGenerator = function(generator) {
-    this.generator = generator;
-  }
-
   Fractal.prototype.setUpdateFunction = function(updateFunction) {
     this.updateFunction = updateFunction;
-  }
-
-  // Draw a point a certain color.
-  function draw(x, y, color, ctx) {
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, 1, 1);
   }
 
   function getMousePos(jCanvas, e) {
