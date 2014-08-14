@@ -1,3 +1,22 @@
+:ruby
+  keywords = [
+    'developer',
+    'web developer',
+    'software engineer',
+    'ruby on rails developer',
+    'ror developer',
+    'javascript developer',
+    'backbone.js developer',
+    'web application development',
+    'ruby on rails consulting',
+    'hire ruby on rails developer',
+    'brian mason',
+    'brian dale mason',
+    'brian d mason',
+    'brian.dale.mason',
+    'brian.dale.mason@gmail.com'
+  ]
+
 !!!
 %html
   %head
@@ -5,6 +24,7 @@
     = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true
     = javascript_include_tag 'application', 'data-turbolinks-track' => true
     = csrf_meta_tags
+    %meta{ name: 'keywords', content: keywords.join(', ') }
 
   %body
     = yield
