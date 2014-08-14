@@ -1,4 +1,6 @@
-class StaticPagesController < ActionController::Base
+# This controller handles static content, loosely defined. This pretty much just
+# means whatever existed on the site previously.
+class StaticPagesController < ApplicationController
   def index
   end
 
