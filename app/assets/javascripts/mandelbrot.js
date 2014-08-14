@@ -137,6 +137,13 @@
       var kReal = julia.minReal + mousePos.x * julia.realPixel;
       var kImaginary = julia.maxI - mousePos.y * julia.iPixel;
 
+      // update UI to show K
+      var realValue = Math.round(kReal * 100) / 100,
+          iValue    = Math.round(kImaginary * 100) / 100;
+      var valueString = realValue + ' + ' + iValue + 'i';
+
+      document.getElementById('k-label').innerHTML = valueString;
+
       // We can pass in K to override the default of K = C
       julia.drawFractal(kReal, kImaginary);
     }, false);

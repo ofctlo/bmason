@@ -12,5 +12,7 @@
     %h2.h-text Mandelbrot set
     %canvas{ id: 'mandelbrot', height: 600, width: 600 }
   .jul
-    %h2.h-text Julia Set (K = Mouseover Mandelbrot to set K)
+    %h2.h-text
+      Julia Set K =
+      %span#k-label --
     %canvas{ id: 'julia', height: 600, width: 600 }
