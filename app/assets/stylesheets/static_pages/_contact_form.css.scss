@@ -1,7 +1,17 @@
 .contact-form {
-  input, textarea {
-    min-height: 2em;
+  input {
     border: none;
+    min-height: 2em;
+  }
+
+  textarea {
+    border: 2px solid black;
+    min-height: 8em;
+    margin-top: 2em;
+    resize: none;
+  }
+
+  input, textarea {
     outline: none;
     border-bottom: 2px solid black;
     width: 300px;
@@ -12,13 +22,6 @@
     &:active, &:focus {
       border-bottom: 4px solid black;
     }
-  }
-
-  textarea {
-    border: 2px solid black;
-    min-height: 8em;
-    margin-top: 2em;
-    resize: none;
   }
 }
 
