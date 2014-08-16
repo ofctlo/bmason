@@ -27,5 +27,6 @@
     %meta{ name: 'keywords', content: keywords.join(', ') }
 
   %body
+    = render 'layouts/header'
     = yield
     = render 'layouts/google_analytics'
