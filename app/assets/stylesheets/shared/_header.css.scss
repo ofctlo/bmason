@@ -1,5 +1,13 @@
 .header {
   background: gray;
-  margin: 0px;
-  padding: 0;
+}
+
+.header-nav-right {
+  padding-bottom: 1em;
+
+  a {
+    color: #fff;
+    padding: 0 .5em;
+    text-decoration: none;
+  }
 }
