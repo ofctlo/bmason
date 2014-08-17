@@ -50,13 +50,8 @@
         // TODO: allow some customization of color options
         var r, g, b;
         var i = (this.width * y + x) * 4
-        //this.drawPoint(x, y, n);
         if (n == maxIterations) {
           r = 0, g = 0, b = 0;
-        //} else if (n > maxIterations / 10) {
-        //  b = 255;
-        //  g = (255 / (maxIterations / 2)) * n;
-        //  r = g;
         } else {
           b = (255 / (maxIterations / 2)) * n;
           g = 0, r = 0;
