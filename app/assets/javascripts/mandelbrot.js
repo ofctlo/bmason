@@ -2,6 +2,11 @@
   var maxIterations = 100;
   var juliaMode = 'mousemove';
 
+  // 0 = red
+  // 1 = green
+  // 2 = blue
+  var colorMode = 2;
+
   // The Fractal object is initialized with a generator that is the defining
   // function for that fractal. The canvas and bounds are passed in as well for
   // drawing purposes.
@@ -47,20 +52,18 @@
         var realPart = this.minReal + x * this.realPixel;
         var n = this.calculateN(realPart, iPart, cReal, cImaginary);
 
-        // TODO: allow some customization of color options
-        var r, g, b;
+        // reset to black
         var i = (this.width * y + x) * 4
-        if (n == maxIterations) {
-          r = 0, g = 0, b = 0;
-        } else {
-          b = (255 / (maxIterations / 2)) * n;
-          g = 0, r = 0;
-        }
-
-        data[i] = r;
-        data[i + 1] = g;
-        data[i + 2] = b;
+        data[i] = 0;
+        data[i + 1] = 0;
+        data[i + 2] = 0;
         data[i + 3] = 255; // alpha
+
+        // color unless this point belongs to the set
+        if (n !== maxIterations) {
+          var color = (255 / (maxIterations / 2)) * n;
+          data[i + colorMode] = color;
+        }
       }
     }
     this.context.putImageData(imageData, 0, 0);
@@ -160,6 +163,17 @@
         juliaMode = 'mousemove'
         mandelbrotCanvas.addEventListener(juliaMode, julia.updateFunction);
         button.innerHTML = 'use click';
+      }
+    });
+
+    var colorToggle = document.getElementById('color-toggle');
+    colorToggle.addEventListener('click', function(e) {
+      var newValue = e.target.value;
+      // if the click was within the surrounding div but not on a button there
+      // will be no value
+      if (newValue) {
+        colorMode = parseInt(newValue);
+        mandelbrot.drawFractal();
       }
     });
   }
