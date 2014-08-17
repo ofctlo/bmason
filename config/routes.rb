@@ -3,4 +3,5 @@ Rails.application.routes.draw do
   get '/contact', to: redirect('/')
   post '/contact' => 'static_pages#contact'
   get '/mandelbrot', to: 'static_pages#mandelbrot'
+  get '/resume', to: 'static_pages#resume'
 end
