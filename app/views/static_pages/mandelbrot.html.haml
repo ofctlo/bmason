@@ -11,10 +11,17 @@
     %span.h-text mouse movement
     to generate Julia set:
     %span.h-text#mode-toggle use click
+  %br
+
   #color-toggle
-    %button{ value: 0 } Red
-    %button{ value: 1 } Green
-    %button{ value: 2 } Blue
+    %p Set the fractal base color:
+    = label :red, 'Red'
+    = text_field :red, 'Red', value: 0
+    = label :green, 'Green'
+    = text_field :green, 'Green', value: 0
+    = label :blue, 'Blue'
+    = text_field :blue, 'Blue', value: 255
+    %button#redraw Redraw
 .pics
   .mandel
     %h2.h-text Mandelbrot set

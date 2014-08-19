@@ -7,6 +7,10 @@
   // 2 = blue
   var colorMode = 2;
 
+  var red = 0,
+      green = 0,
+      blue = 255;
+
   // The Fractal object is initialized with a generator that is the defining
   // function for that fractal. The canvas and bounds are passed in as well for
   // drawing purposes.
@@ -38,11 +42,8 @@
   // aren't prohibitively slow.
   Fractal.prototype.drawFractal = function(cReal, cImaginary) {
     // the 'c' params are optional.
-    cReal = typeof cReal !== 'undefined' ? cReal : null;
-    cImaginary = typeof cImaginary !== 'undefined' ? cImaginary : null;
-
-    this.context.fillStyle = 'white';
-    this.context.clearRect(0, 0, this.width, this.height);
+    cReal = (typeof cReal !== 'undefined') ? cReal : null;
+    cImaginary = (typeof cImaginary !== 'undefined') ? cImaginary : null;
 
     imageData = this.context.getImageData(0, 0, this.width, this.height);
     data = imageData.data
@@ -61,8 +62,12 @@
 
         // color unless this point belongs to the set
         if (n !== maxIterations) {
-          var color = (255 / (maxIterations / 2)) * n;
-          data[i + colorMode] = color;
+          var r = (red / (maxIterations / 2)) * n;
+          var g = (green / (maxIterations / 2)) * n;
+          var b = (blue / (maxIterations / 2)) * n;
+          data[i + 0] = r;
+          data[i + 1] = g;
+          data[i + 2] = b;
         }
       }
     }
@@ -104,6 +109,10 @@
       x: e.clientX - rect.left,
       y: e.clientY - rect.top
     };
+  }
+
+  function validColor(value) {
+    return (value >= 0 && value <= 255);
   }
 
   window.onload = function() {
@@ -166,14 +175,22 @@
       }
     });
 
-    var colorToggle = document.getElementById('color-toggle');
+    //var colorToggle = document.getElementById('color-toggle');
+    var colorToggle = document.getElementById('redraw');
     colorToggle.addEventListener('click', function(e) {
-      var newValue = e.target.value;
-      // if the click was within the surrounding div but not on a button there
-      // will be no value
-      if (newValue) {
-        colorMode = parseInt(newValue);
+      r = document.getElementById('red_Red').value;
+      g = document.getElementById('green_Green').value;
+      b = document.getElementById('blue_Blue').value;
+
+      if (validColor(r) && validColor(g) && validColor(b)) {
+        red   = r,
+        green = g,
+        blue  = b;
+        // apparently this is jQuery :(
+        //colorToggle.removeClass('invalid');
         mandelbrot.drawFractal();
+      } else {
+        //colorToggle.addClass('invalid');
       }
     });
   }
