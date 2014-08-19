@@ -115,7 +115,7 @@
     return (value >= 0 && value <= 255);
   }
 
-  window.onload = function() {
+  $(function() {
     // The function for calculating values in the Mandelbrot set.
     var mandelbrotFunc = function(realPart, iPart, cReal, cImaginary) {
       newReal = realPart * realPart - iPart * iPart + cReal;
@@ -193,5 +193,5 @@
         //colorToggle.addClass('invalid');
       }
     });
-  }
+  });
 })();
