@@ -7,9 +7,9 @@
   // 2 = blue
   var colorMode = 2;
 
-  var red = 0,
+  var red = 255,
       green = 0,
-      blue = 255;
+      blue = 0;
 
   // The Fractal object is initialized with a generator that is the defining
   // function for that fractal. The canvas and bounds are passed in as well for
@@ -197,9 +197,6 @@
       return [newReal, newI];
     }
     var julia = new Fractal(juliaFunc, 'julia', -2.0, 2.0, -2.0);
-
-    // setup event handling
-    var mandelbrotCanvas = mandelbrot.canvas;
 
     juliaUpdateFunction = generateJuliaUpdateFunction(mandelbrot, julia);
     julia.setUpdateFunction(juliaUpdateFunction, false);
