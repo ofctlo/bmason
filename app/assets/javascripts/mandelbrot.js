@@ -202,7 +202,7 @@
     julia.setUpdateFunction(juliaUpdateFunction, false);
 
     // default mode setup
-    mandelbrotCanvas.addEventListener('mousemove', julia.updateFunction);
+    mandelbrot.canvas.addEventListener('mousemove', julia.updateFunction);
 
     setupModeToggle(mandelbrot, julia)
     setupColorToggle(mandelbrot);
