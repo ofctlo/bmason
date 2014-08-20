@@ -115,6 +115,70 @@
     return (value >= 0 && value <= 255);
   }
 
+  function generateJuliaUpdateFunction(mandelbrot, julia) {
+    return function(e) {
+      // This extra option is needed to create the Julia set
+      mousePos = getMousePos(mandelbrot.canvas, e);
+
+      var kReal = julia.minReal + mousePos.x * julia.realPixel;
+      var kImaginary = julia.maxI - mousePos.y * julia.iPixel;
+
+      // update UI to show K
+      var realValue = Math.round(kReal * 100) / 100,
+          iValue    = Math.round(kImaginary * 100) / 100;
+      var valueString = realValue + ' + ' + iValue + 'i';
+
+      document.getElementById('k-label').innerHTML = valueString;
+
+      // We can pass in K to override the default of K = C
+      julia.drawFractal(kReal, kImaginary);
+    }
+  }
+
+  function setupColorToggle(fractal) {
+    //var colorToggle = document.getElementById('color-toggle');
+    var colorToggle = document.getElementById('redraw');
+    colorToggle.addEventListener('click', function(e) {
+      r = document.getElementById('red_Red').value;
+      g = document.getElementById('green_Green').value;
+      b = document.getElementById('blue_Blue').value;
+
+      if (validColor(r) && validColor(g) && validColor(b)) {
+        red   = r,
+        green = g,
+        blue  = b;
+        // apparently this is jQuery :(
+        //colorToggle.removeClass('invalid');
+        fractal.drawFractal();
+      } else {
+        //colorToggle.addClass('invalid');
+      }
+    });
+  }
+
+  function setupModeToggle(triggerFractal, updateFractal) {
+    // set up toggling of mode
+    var modeToggle = document.getElementById('mode-toggle');
+    modeToggle.addEventListener('click', function(e) {
+      button = e.currentTarget;
+      if (juliaMode === 'mousemove') {
+        triggerFractal.canvas
+          .removeEventListener(juliaMode, updateFractal.updateFunction);
+        juliaMode = 'click';
+        triggerFractal.canvas
+          .addEventListener(juliaMode, updateFractal.updateFunction);
+        button.innerHTML = 'use mouse move';
+      } else if (button.innerHTML === 'use mouse move') {
+        triggerFractal.canvas
+          .removeEventListener(juliaMode, updateFractal.updateFunction);
+        juliaMode = 'mousemove'
+        triggerFractal.canvas
+          .addEventListener(juliaMode, updateFractal.updateFunction);
+        button.innerHTML = 'use click';
+      }
+    });
+  }
+
   $(function() {
     // The function for calculating values in the Mandelbrot set.
     var mandelbrotFunc = function(realPart, iPart, cReal, cImaginary) {
@@ -137,61 +201,13 @@
     // setup event handling
     var mandelbrotCanvas = mandelbrot.canvas;
 
-    julia.setUpdateFunction(function(e) {
-      // This extra option is needed to create the Julia set
-      mousePos = getMousePos(mandelbrotCanvas, e);
+    juliaUpdateFunction = generateJuliaUpdateFunction(mandelbrot, julia);
+    julia.setUpdateFunction(juliaUpdateFunction, false);
 
-      var kReal = julia.minReal + mousePos.x * julia.realPixel;
-      var kImaginary = julia.maxI - mousePos.y * julia.iPixel;
-
-      // update UI to show K
-      var realValue = Math.round(kReal * 100) / 100,
-          iValue    = Math.round(kImaginary * 100) / 100;
-      var valueString = realValue + ' + ' + iValue + 'i';
-
-      document.getElementById('k-label').innerHTML = valueString;
-
-      // We can pass in K to override the default of K = C
-      julia.drawFractal(kReal, kImaginary);
-    }, false);
-
+    // default mode setup
     mandelbrotCanvas.addEventListener('mousemove', julia.updateFunction);
 
-    // set up toggling of mode
-    var modeToggle = document.getElementById('mode-toggle');
-    modeToggle.addEventListener('click', function(e) {
-      button = e.currentTarget;
-      if (juliaMode === 'mousemove') {
-        mandelbrotCanvas.removeEventListener(juliaMode, julia.updateFunction);
-        juliaMode = 'click';
-        mandelbrotCanvas.addEventListener(juliaMode, julia.updateFunction);
-
-        button.innerHTML = 'use mouse move';
-      } else if (button.innerHTML === 'use mouse move') {
-        mandelbrotCanvas.removeEventListener(juliaMode, julia.updateFunction);
-        juliaMode = 'mousemove'
-        mandelbrotCanvas.addEventListener(juliaMode, julia.updateFunction);
-        button.innerHTML = 'use click';
-      }
-    });
-
-    //var colorToggle = document.getElementById('color-toggle');
-    var colorToggle = document.getElementById('redraw');
-    colorToggle.addEventListener('click', function(e) {
-      r = document.getElementById('red_Red').value;
-      g = document.getElementById('green_Green').value;
-      b = document.getElementById('blue_Blue').value;
-
-      if (validColor(r) && validColor(g) && validColor(b)) {
-        red   = r,
-        green = g,
-        blue  = b;
-        // apparently this is jQuery :(
-        //colorToggle.removeClass('invalid');
-        mandelbrot.drawFractal();
-      } else {
-        //colorToggle.addClass('invalid');
-      }
-    });
+    setupModeToggle(mandelbrot, julia)
+    setupColorToggle(mandelbrot);
   });
 })();
