@@ -1,7 +1,7 @@
 # Helper methods available to all views
 module ApplicationHelper
   def markdown(text)
-    renderer = Redcarpet::Render::HTML.new(hard_wrap: true, filter_html: true)
+    renderer = ::Redcarpet::Render::HTML.new(hard_wrap: true, filter_html: true)
     options = {
       autolink: true,
       no_intra_emphasis: true,
@@ -11,6 +11,6 @@ module ApplicationHelper
       superscript: true
     }
 
-    Redcarpet::Markdown.new(renderer, options).render(text).html_safe
+    ::Redcarpet::Markdown.new(renderer, options).render(text).html_safe
   end
 end
