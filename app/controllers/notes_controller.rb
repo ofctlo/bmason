@@ -4,6 +4,7 @@
 # files are .html.md.
 class NotesController < ApplicationController
   def show
-    render "#{Rails.root}/public#{request.path}.html.md", layout: false
+    @note = File.read("#{Rails.root}/public#{request.path}.html.md")
+    render layout: false
   end
 end
