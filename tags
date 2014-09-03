@@ -1,0 +1,31 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Application	config/application.rb	/^  class Application < Rails::Application$/;"	c	class:Bmason
+ApplicationController	app/controllers/application_controller.rb	/^class ApplicationController < ActionController::Base$/;"	c
+ApplicationHelper	app/helpers/application_helper.rb	/^module ApplicationHelper$/;"	m
+Bmason	config/application.rb	/^module Bmason$/;"	m
+ContactMailer	app/mailers/contact_mailer.rb	/^class ContactMailer < ActionMailer::Base$/;"	c
+Fractal	app/assets/javascripts/mandelbrot.js	/^  function Fractal(generator, canvasId, minReal, maxReal, minI) {$/;"	c
+Fractal.calculateN	app/assets/javascripts/mandelbrot.js	/^  Fractal.prototype.calculateN = function(realPart, iPart, cReal, cImaginary) {$/;"	m
+Fractal.drawFractal	app/assets/javascripts/mandelbrot.js	/^  Fractal.prototype.drawFractal = function(cReal, cImaginary) {$/;"	m
+Fractal.setUpdateFunction	app/assets/javascripts/mandelbrot.js	/^  Fractal.prototype.setUpdateFunction = function(updateFunction) {$/;"	m
+StaticPagesController	app/controllers/static_pages_controller.rb	/^class StaticPagesController < ApplicationController$/;"	c
+colorMode	app/assets/javascripts/mandelbrot.js	/^  var colorMode = 2;$/;"	v
+contact	app/controllers/static_pages_controller.rb	/^  def contact$/;"	f	class:StaticPagesController
+contact	app/mailers/contact_mailer.rb	/^  def contact(name, from, message)$/;"	f	class:ContactMailer
+generateJuliaUpdateFunction	app/assets/javascripts/mandelbrot.js	/^  function generateJuliaUpdateFunction(mandelbrot, julia) {$/;"	f
+getMousePos	app/assets/javascripts/mandelbrot.js	/^  function getMousePos(jCanvas, e) {$/;"	f
+index	app/controllers/static_pages_controller.rb	/^  def index$/;"	f	class:StaticPagesController
+juliaMode	app/assets/javascripts/mandelbrot.js	/^  var juliaMode = 'mousemove';$/;"	v
+mandelbrot	app/controllers/static_pages_controller.rb	/^  def mandelbrot$/;"	f	class:StaticPagesController
+oldsig	config/unicorn_init.sh	/^oldsig () {$/;"	f
+red	app/assets/javascripts/mandelbrot.js	/^  var red = 255,$/;"	v
+run	config/unicorn_init.sh	/^run () {$/;"	f
+setupColorToggle	app/assets/javascripts/mandelbrot.js	/^  function setupColorToggle(fractal) {$/;"	f
+setupModeToggle	app/assets/javascripts/mandelbrot.js	/^  function setupModeToggle(triggerFractal, updateFractal) {$/;"	f
+sig	config/unicorn_init.sh	/^sig () {$/;"	f
+validColor	app/assets/javascripts/mandelbrot.js	/^  function validColor(value) {$/;"	f
