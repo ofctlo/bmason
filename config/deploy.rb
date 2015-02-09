@@ -10,7 +10,7 @@ set :use_sudo,      false
 set :default_shell, '/bin/bash -l'
 
 set :scm,        'git'
-set :repository, "git@github.com:ofctlo/#{application}.git"
+set :repository, "git@github.com:ofctlo/#{application}-rails.git"
 set :branch,     'master'
 
 default_run_options[:pty]   = true
